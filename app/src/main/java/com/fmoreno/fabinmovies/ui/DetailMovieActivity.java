@@ -5,7 +5,6 @@ import static com.fmoreno.fabinmovies.internet.WebServicesConstant.API_KEY;
 import static com.fmoreno.fabinmovies.internet.WebServicesConstant.BASE_URL_APPLICATION;
 import static com.fmoreno.fabinmovies.internet.WebServicesConstant.BASE_URL_DETAIL_MOVIE;
 import static com.fmoreno.fabinmovies.internet.WebServicesConstant.MOVIE;
-import static com.fmoreno.fabinmovies.internet.WebServicesConstant.POPULAR;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -14,10 +13,14 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -25,19 +28,31 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
 import com.fmoreno.fabinmovies.R;
+import com.fmoreno.fabinmovies.adapter.TrailersAdapter;
 import com.fmoreno.fabinmovies.internet.WebApiRequest;
-import com.fmoreno.fabinmovies.model.DetatilMovie;
+import com.fmoreno.fabinmovies.model.DetailMovie;
 import com.fmoreno.fabinmovies.model.MovieList;
 import com.fmoreno.fabinmovies.utils.Utils;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class DetailMovieActivity extends AppCompatActivity {
     MovieList.Result movie;
+    DetailMovie movieDetail;
+
+    ConstraintLayout clMovieDetail;
 
     private ProgressBar progressBar;
 
     TextView textViewTitle,textViewVotes,textViewStars,textViewDate,textViewDescription,textViewTagline;
 
     ImageView imageViewPoster, imageViewBanner;
+
+    RecyclerView rvTrailers;
+    TrailersAdapter adapter;
+
+    public static List<DetailMovie.Video> sVideoList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,11 +62,12 @@ public class DetailMovieActivity extends AppCompatActivity {
         initView();
         setImage();
         callGetTopRatedMoviesApi();
-        setText();
-        setAnimation();
+        //setText();
+        //setAnimation();
     }
 
     private void initView(){
+        clMovieDetail = findViewById(R.id.clMovieDetail);
         textViewTitle = findViewById(R.id.textViewTitle);
         textViewVotes = findViewById(R.id.textViewVotes);
         textViewStars = findViewById(R.id.textViewStars);
@@ -61,6 +77,22 @@ public class DetailMovieActivity extends AppCompatActivity {
 
         imageViewPoster = findViewById(R.id.imageViewPoster);
         imageViewBanner = findViewById(R.id.imageViewBanner);
+
+        rvTrailers = findViewById(R.id.rvTrailers);
+
+        //if(sVideoList == null){
+            sVideoList = new ArrayList<DetailMovie.Video>();
+        //}
+        adapter = new TrailersAdapter(sVideoList);
+        // Attach the adapter to the recyclerview to populate items
+        rvTrailers.setAdapter(adapter);
+        rvTrailers.setLayoutManager(new LinearLayoutManager(this,  LinearLayoutManager.HORIZONTAL, false));
+
+        progressBar = new ProgressBar(this, null, android.R.attr.progressBarStyleLarge);
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(100, 100);
+        params.addRule(RelativeLayout.CENTER_IN_PARENT);
+        progressBar.setVisibility(View.GONE);
+        clMovieDetail.addView(progressBar, params);
 
     }
 
@@ -82,7 +114,14 @@ public class DetailMovieActivity extends AppCompatActivity {
         textViewStars.setText(movie.getStars());
         textViewDate.setText(Utils.getYear(movie.getReleaseDate()));
         textViewDescription.setText(movie.getOverview());
-        //textViewTagline.setText(movie.getOverview());
+        textViewTagline.setText(movieDetail.tagline);
+        for(DetailMovie.Video video : movieDetail.videos.results){
+            sVideoList.add(video);
+        }
+        if(sVideoList != null && sVideoList.size() > 0){
+            //adapter.notifyDataSetChanged();
+            adapter.addMovies(sVideoList);
+        }
     }
 
     private void setAnimation(){
@@ -92,17 +131,18 @@ public class DetailMovieActivity extends AppCompatActivity {
         final Animation right_out = AnimationUtils.loadAnimation(this, R.anim.right_out);
         final Animation slide_up = AnimationUtils.loadAnimation(this, R.anim.slide_up);
         final Animation slide_bottom = AnimationUtils.loadAnimation(this, R.anim.slide_bottom);
+        final Animation bounce = AnimationUtils.loadAnimation(this, R.anim.bounce);
 
-        imageViewPoster.startAnimation(atg);
+        //imageViewPoster.startAnimation(atg);
         imageViewBanner.startAnimation(packageimg);
 
         textViewTitle.startAnimation(right_in);
         textViewVotes.startAnimation(slide_bottom);
         textViewStars.startAnimation(slide_bottom);
         textViewDate.startAnimation(slide_bottom);
-
+        textViewTagline.startAnimation(slide_up);
         textViewDescription.startAnimation(slide_up);
-        //textViewTagline.startAnimation(right_out);
+
     }
 
     /**
@@ -111,7 +151,7 @@ public class DetailMovieActivity extends AppCompatActivity {
 
     private void showProgress() {
         try{
-            //progressBar.setVisibility(View.VISIBLE);
+            progressBar.setVisibility(View.VISIBLE);
         }catch (Exception ex){
             Log.d(TAG, "showProgress: ex:"+ ex.toString());
         }
@@ -123,7 +163,7 @@ public class DetailMovieActivity extends AppCompatActivity {
      */
 
     private void hideProgress() {
-        //progressBar.setVisibility(View.GONE);
+        progressBar.setVisibility(View.GONE);
     }
 
     /**
@@ -174,9 +214,14 @@ public class DetailMovieActivity extends AppCompatActivity {
                     hideProgress();
 
 
-                    DetatilMovie movieListModel = (DetatilMovie) Utils.jsonToPojo(response, DetatilMovie.class);
+                    movieDetail = (DetailMovie) Utils.jsonToPojo(response, DetailMovie.class);
 
-                    Log.d("Detail", movieListModel.title);
+                    Log.d("Detail", movieDetail.title);
+
+                    setText();
+                    setAnimation();
+
+
                    /* if (movieListModel.getResults() != null &&
                             movieListModel.getResults().size() > 0) {
                         recyclerViewAdapter.addMovies(movieListModel.getResults());

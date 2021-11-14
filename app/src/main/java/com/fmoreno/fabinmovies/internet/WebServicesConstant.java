@@ -17,8 +17,8 @@ public class WebServicesConstant {
     //Details Movie
     public static final String BASE_URL_DETAIL_MOVIE = "&append_to_response=videos,credits,reviews";
 
-    /*@GET("movie/{id}?append_to_response=videos,credits,reviews")
-    LiveData<ApiResponse<Movie>> getMovieDetails(@Path("id") long id);*/
+    public static final String YOUTUBE_WEB_URL = "https://www.youtube.com/watch?v=";
+
 
     //api key (Its my personal) you have to crate your own to avoid suspension of your account
 

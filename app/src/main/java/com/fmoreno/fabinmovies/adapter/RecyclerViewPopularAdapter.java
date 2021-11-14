@@ -2,7 +2,6 @@ package com.fmoreno.fabinmovies.adapter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,26 +11,23 @@ import android.view.animation.AnimationUtils;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.fmoreno.fabinmovies.R;
+import com.fmoreno.fabinmovies.adapter.filters.PopularFilter;
 import com.fmoreno.fabinmovies.interfaces.RecyclerViewInterface;
 import com.fmoreno.fabinmovies.model.MovieList;
-import com.fmoreno.fabinmovies.ui.DetailMovieActivity;
-import com.fmoreno.fabinmovies.utils.MyFilter;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder>
+public class RecyclerViewPopularAdapter extends RecyclerView.Adapter<RecyclerViewPopularAdapter.ViewHolder>
 implements Filterable {
     public static final String TAG = "RecyclerViewAdapter";
-    public MyFilter mFilter;
+    public PopularFilter mFilter;
     RecyclerViewInterface recyclerViewInterface;
 
     public static List<MovieList.Result> moviesList = new ArrayList<>();
@@ -39,7 +35,7 @@ implements Filterable {
     private Context context;
 
 
-    public RecyclerViewAdapter(Context context, RecyclerViewInterface recyclerViewInterface) {
+    public RecyclerViewPopularAdapter(Context context, RecyclerViewInterface recyclerViewInterface) {
         this.context = context;
         this.recyclerViewInterface = recyclerViewInterface;
     }
@@ -50,7 +46,7 @@ implements Filterable {
         if (mFilter == null){
             mFilteredMoviesList.clear();
             mFilteredMoviesList.addAll(this.moviesList);
-            mFilter = new MyFilter(RecyclerViewAdapter.this, this.mFilteredMoviesList);
+            mFilter = new PopularFilter(RecyclerViewPopularAdapter.this, this.mFilteredMoviesList);
         }
         return mFilter;
 
@@ -84,7 +80,7 @@ implements Filterable {
         holder.post.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                recyclerViewInterface.onItemClick(moviesList.get(position));
+                recyclerViewInterface.onItemClick(moviesList.get(position), holder.post);
             }
         });
 

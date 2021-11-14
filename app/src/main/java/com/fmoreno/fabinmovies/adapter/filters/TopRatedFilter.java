@@ -1,20 +1,20 @@
-package com.fmoreno.fabinmovies.utils;
+package com.fmoreno.fabinmovies.adapter.filters;
 
 import android.widget.Filter;
 
-import com.fmoreno.fabinmovies.adapter.RecyclerViewAdapter;
+import com.fmoreno.fabinmovies.adapter.RecyclerViewTopRatedAdapter;
 import com.fmoreno.fabinmovies.model.MovieList;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MyFilter extends Filter {
-    private final RecyclerViewAdapter recyclerViewAdapter;
+public class TopRatedFilter extends Filter {
+    private final RecyclerViewTopRatedAdapter recyclerViewTopRatedAdapter;
     private final List<MovieList.Result> originalList;
     private final List<MovieList.Result> filteredList;
 
-    public MyFilter(RecyclerViewAdapter myAdapter,  List<MovieList.Result> originalList) {
-        this.recyclerViewAdapter = myAdapter;
+    public TopRatedFilter(RecyclerViewTopRatedAdapter myAdapter, List<MovieList.Result> originalList) {
+        this.recyclerViewTopRatedAdapter = myAdapter;
         this.originalList = originalList;
         this.filteredList = new ArrayList<MovieList.Result>();
     }
@@ -44,9 +44,9 @@ public class MyFilter extends Filter {
     @Override
     protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
 
-        recyclerViewAdapter.moviesList.clear();
-        recyclerViewAdapter.moviesList.addAll((ArrayList<MovieList.Result>)filterResults.values);
-        recyclerViewAdapter.notifyDataSetChanged();
+        recyclerViewTopRatedAdapter.moviesList.clear();
+        recyclerViewTopRatedAdapter.moviesList.addAll((ArrayList<MovieList.Result>)filterResults.values);
+        recyclerViewTopRatedAdapter.notifyDataSetChanged();
 
     }
 }

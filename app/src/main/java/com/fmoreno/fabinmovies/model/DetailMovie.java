@@ -2,7 +2,7 @@ package com.fmoreno.fabinmovies.model;
 
 import java.util.List;
 
-public class DetatilMovie {
+public class DetailMovie {
     public boolean adult;
     public String backdrop_path;
     public BelongsToCollection belongs_to_collection;
@@ -59,7 +59,7 @@ public class DetatilMovie {
         public String name;
     }
 
-    public class Result{
+    public class Video{
         public String iso_639_1;
         public String iso_3166_1;
         public String name;
@@ -73,6 +73,6 @@ public class DetatilMovie {
     }
 
     public class Videos{
-        public List<Result> results;
+        public List<Video> results;
     }
 }

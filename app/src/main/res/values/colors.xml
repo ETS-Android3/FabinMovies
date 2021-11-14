@@ -14,4 +14,8 @@
     <color name="yellow">#D9CC23</color>
     <color name="tabs_background">#0C2C38</color>
     <color name="red">#D20D45</color>
+
+    <color name="text_black_60">#99000000</color>
+
+    <color name="secondaryText">@color/text_black_60</color>
 </resources>

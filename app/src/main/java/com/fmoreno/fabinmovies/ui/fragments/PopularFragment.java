@@ -4,7 +4,6 @@ import static com.fmoreno.fabinmovies.internet.WebServicesConstant.API_KEY;
 import static com.fmoreno.fabinmovies.internet.WebServicesConstant.BASE_URL_APPLICATION;
 import static com.fmoreno.fabinmovies.internet.WebServicesConstant.MOVIE;
 import static com.fmoreno.fabinmovies.internet.WebServicesConstant.POPULAR;
-import static com.fmoreno.fabinmovies.internet.WebServicesConstant.TOP_RATED;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,11 +16,10 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import androidx.appcompat.widget.SearchView;
+import androidx.core.app.ActivityOptionsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.volley.Request;
@@ -29,7 +27,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
 import com.fmoreno.fabinmovies.R;
-import com.fmoreno.fabinmovies.adapter.RecyclerViewAdapter;
+import com.fmoreno.fabinmovies.adapter.RecyclerViewPopularAdapter;
 import com.fmoreno.fabinmovies.interfaces.RecyclerViewInterface;
 import com.fmoreno.fabinmovies.internet.WebApiRequest;
 import com.fmoreno.fabinmovies.model.Movie;
@@ -38,7 +36,6 @@ import com.fmoreno.fabinmovies.ui.DetailMovieActivity;
 import com.fmoreno.fabinmovies.utils.Utils;
 import com.fmoreno.fabinmovies.viewmodel.PopularViewModel;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 
 
@@ -55,7 +52,7 @@ public class PopularFragment extends Fragment implements RecyclerViewInterface {
     RecyclerView rv_popular;
 
     PopularViewModel viewModel;
-    RecyclerViewAdapter recyclerViewAdapter;
+    RecyclerViewPopularAdapter recyclerViewPopularAdapter;
     GridLayoutManager layoutManager;
 
     //For Load more functionality
@@ -91,7 +88,7 @@ public class PopularFragment extends Fragment implements RecyclerViewInterface {
         rv_popular.setLayoutManager(layoutManager);
         rv_popular.setHasFixedSize(true);
         rv_popular.clearOnScrollListeners(); //clear scrolllisteners
-        recyclerViewAdapter = new RecyclerViewAdapter(context.getActivity(), this);
+        recyclerViewPopularAdapter = new RecyclerViewPopularAdapter(context.getActivity(), this);
 
         init();
 
@@ -111,7 +108,7 @@ public class PopularFragment extends Fragment implements RecyclerViewInterface {
             rv_popular.setLayoutManager(layoutManager);
             rv_popular.setHasFixedSize(true);
             rv_popular.clearOnScrollListeners(); //clear scrolllisteners
-            rv_popular.setAdapter(recyclerViewAdapter);
+            rv_popular.setAdapter(recyclerViewPopularAdapter);
         }
     };
 
@@ -121,7 +118,7 @@ public class PopularFragment extends Fragment implements RecyclerViewInterface {
          *
          */
 
-        rv_popular.setAdapter(recyclerViewAdapter);
+        rv_popular.setAdapter(recyclerViewPopularAdapter);
 
         rv_popular.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -154,7 +151,7 @@ public class PopularFragment extends Fragment implements RecyclerViewInterface {
         search_bar.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                recyclerViewAdapter.getFilter().filter(query);
+                recyclerViewPopularAdapter.getFilter().filter(query);
                 if(query.isEmpty()){
                     previousTotal = 0;
                     firstVisibleItem = 0;
@@ -167,7 +164,7 @@ public class PopularFragment extends Fragment implements RecyclerViewInterface {
             @Override
             public boolean onQueryTextChange(String newText) {
                 //filter(newText);
-                recyclerViewAdapter.getFilter().filter(newText);
+                recyclerViewPopularAdapter.getFilter().filter(newText);
                 if(newText.isEmpty()){
                     previousTotal = 0;
                     firstVisibleItem = 0;
@@ -251,7 +248,7 @@ public class PopularFragment extends Fragment implements RecyclerViewInterface {
 
                     if (movieListModel.getResults() != null &&
                             movieListModel.getResults().size() > 0) {
-                        recyclerViewAdapter.addMovies(movieListModel.getResults());
+                        recyclerViewPopularAdapter.addMovies(movieListModel.getResults());
                     } else {
                         Log.e(TAG, "list empty==");
                     }
@@ -282,11 +279,13 @@ public class PopularFragment extends Fragment implements RecyclerViewInterface {
     }
     MovieList.Result movie;
     @Override
-    public void onItemClick(MovieList.Result result) {
+    public void onItemClick(MovieList.Result result, View view) {
         movie = result;
         Intent datailActivity = new Intent(context.getActivity(), DetailMovieActivity.class);
         datailActivity.putExtra("movie", movie);
-        startActivity(datailActivity);
+        ActivityOptionsCompat options = ActivityOptionsCompat.
+                makeSceneTransitionAnimation(context.getActivity(), view, "poster");
+        startActivity(datailActivity, options.toBundle());
         context.getActivity().overridePendingTransition(R.anim.zoom_forward_in, R.anim.zoom_forward_out);
         //context.getActivity().finish();
     }
