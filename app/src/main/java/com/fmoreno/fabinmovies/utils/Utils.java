@@ -1,0 +1,102 @@
+package com.fmoreno.fabinmovies.utils;
+
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+
+import com.google.gson.Gson;
+
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
+public class Utils {
+    private static SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+    private static SimpleDateFormat DATE_FORMAT_YEAR = new SimpleDateFormat("yyyy", Locale.US);
+
+    private static Date toDate(String date) throws ParseException {
+        return DATE_FORMAT.parse(date);
+    }
+
+    public static String getYear(String date){
+        if(date != null && !date.isEmpty()){
+            try {
+                return DATE_FORMAT_YEAR.format(toDate(date));
+            } catch (ParseException e) {
+                e.printStackTrace();
+                return "";
+            }
+        } else {
+            return "";
+        }
+    }
+
+    /**
+     * Json to Pojo to parse the response into our model class.
+     *
+     * @param jsonString
+     * @param pojoClass
+     * @return
+     */
+    public static Object jsonToPojo(String jsonString, Class<?> pojoClass) {
+        return new Gson().fromJson(jsonString, pojoClass);
+    }
+
+    /**
+     * This method checks if the Network available on the device or not.
+     *
+     * @param context
+     * @return true if network available, false otherwise
+     */
+    public static Boolean isNetworkAvailable(Context context) {
+        boolean connected = false;
+        try {
+            final ConnectivityManager cm = (ConnectivityManager) context
+                    .getSystemService(Context.CONNECTIVITY_SERVICE);
+            final NetworkInfo netInfo = cm.getActiveNetworkInfo();
+            if (netInfo != null && netInfo.isConnectedOrConnecting()) {
+                connected = true;
+            } else if (netInfo != null && netInfo.isConnected()
+                    && cm.getActiveNetworkInfo().isAvailable()) {
+                connected = true;
+            } else if (netInfo != null && netInfo.isConnected()) {
+                try {
+                    URL url = new URL("http://www.google.com");
+                    HttpURLConnection urlc = (HttpURLConnection) url
+                            .openConnection();
+                    urlc.setConnectTimeout(3000);
+                    urlc.connect();
+                    if (urlc.getResponseCode() == 200) {
+                        connected = true;
+                    }
+                } catch (MalformedURLException e1) {
+                    e1.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } else if (cm != null) {
+                final NetworkInfo[] netInfoAll = cm.getAllNetworkInfo();
+                for (NetworkInfo ni : netInfoAll) {
+                    System.out.println("get network type :::" + ni.getTypeName());
+                    if ((ni.getTypeName().equalsIgnoreCase("WIFI") || ni
+                            .getTypeName().equalsIgnoreCase("MOBILE"))
+                            && ni.isConnected() && ni.isAvailable()) {
+                        connected = true;
+                        if (connected) {
+                            break;
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return connected;
+    }
+}
