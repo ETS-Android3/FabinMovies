@@ -19,6 +19,7 @@ import androidx.appcompat.widget.SearchView;
 import androidx.core.app.ActivityOptionsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -93,13 +94,14 @@ public class PopularFragment extends Fragment implements RecyclerViewInterface {
         init();
 
         callGetTopRatedMoviesApi();
-        //viewModel = ViewModelProviders.of(this).get(PopularViewModel.class);
-        //viewModel.getUserMutableLiveData().observe(context.getActivity(), userListUpdateObserver);
-        // Inflate the layout for this fragment
+        /*viewModel = ViewModelProviders.of(this).get(PopularViewModel.class);
+        viewModel.getUserMutableLiveData().observe(context.getActivity(), userListUpdateObserver);
+        //Inflate the layout for this fragment
+        viewModel.setContext(context.getActivity());*/
         return mRootView;
     }
 
-    Observer<ArrayList<Movie>> userListUpdateObserver = new Observer<ArrayList<Movie>>() {
+    /*Observer<ArrayList<Movie>> userListUpdateObserver = new Observer<ArrayList<Movie>>() {
         @Override
         public void onChanged(ArrayList<Movie> userArrayList) {
             //recyclerViewAdapter = new RecyclerViewAdapter(context.getActivity());
@@ -110,7 +112,7 @@ public class PopularFragment extends Fragment implements RecyclerViewInterface {
             rv_popular.clearOnScrollListeners(); //clear scrolllisteners
             rv_popular.setAdapter(recyclerViewPopularAdapter);
         }
-    };
+    };*/
 
     private void init(){
         /**

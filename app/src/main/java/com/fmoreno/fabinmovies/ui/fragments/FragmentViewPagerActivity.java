@@ -16,7 +16,7 @@ import com.google.android.material.tabs.TabLayoutMediator;
 
 public class FragmentViewPagerActivity extends AppCompatActivity {
     // tab titles
-    private String[] titles = new String[]{"Popular", "Top Rared"};
+    private String[] titles = new String[]{"Popular", "Top Rated"};
 
     ViewPager2 view_pager;
     TabLayout tab_layout;

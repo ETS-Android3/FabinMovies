@@ -51,13 +51,7 @@ public class TrailersAdapter extends
             trailer_name = itemView.findViewById(R.id.trailer_name);
 
         }
-
-
-
-
     }
-
-
 
     // Store a member variable for the contacts
     private List<DetailMovie.Video> mVideos;
