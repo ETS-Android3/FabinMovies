@@ -1,6 +1,12 @@
 # FabinMovies
  Aplicación Android
 
+## ✨ Screenshots
+| Main Screen | Demo |
+|:-:|:-:|
+| ![1](demo/demo-1.gif?raw=true) | ![2](demo/demo-2.gif?raw=true) |
+
+
 ## 🌟 Características
 *   Descubre las películas más populares y mejor calificadas
 *   El usuario puede ver y reproducir videos en youtube
