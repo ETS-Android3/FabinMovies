@@ -2,7 +2,7 @@
  Aplicación Android
 
 ## ✨ Screenshots
-| Main Screen | Demo |
+| Demo 1 | Demo 2 |
 |:-:|:-:|
 | ![1](demo/demo-1.gif?raw=true) | ![2](demo/demo-2.gif?raw=true) |
 
