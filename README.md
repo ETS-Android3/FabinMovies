@@ -11,6 +11,7 @@
 *   Utilizar Room como base de datos
 *   Agregar favoritos
 *   Acceso directo a plataformas virtuales de streaming como (Netflix)
+*   Incluir Firebase (Crashlytics)
 
 ### Prerrequisitos
 *   Android Studio 3.2+

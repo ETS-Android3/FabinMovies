@@ -13,6 +13,7 @@ import java.net.URL;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
@@ -98,5 +99,38 @@ public class Utils {
             e.printStackTrace();
         }
         return connected;
+    }
+
+    public static String getCurrentYear() {
+        return Utils.getCurrentime("yyyy");
+    }
+
+    /**
+     * get Current Time with format parameter
+     *
+     * @param format
+     * @return string time
+     */
+    public static String getCurrentime(String format) {
+        Calendar cal = Calendar.getInstance();
+        cal.getTime();
+        SimpleDateFormat sdf = new SimpleDateFormat(format);
+        return sdf.format(cal.getTime());
+
+    }
+
+    /**
+     * this method get resource from any object who need it.
+     *
+     * @param idResource
+     */
+    public static String getStringFromResource(int idResource, Context _context) {
+        // TODO Auto-generated method stub
+        try {
+            return _context.getResources().getString(idResource);
+        } catch (NullPointerException e) {
+            // TODO: handle exception
+            return "";
+        }
     }
 }
