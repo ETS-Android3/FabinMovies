@@ -14,7 +14,6 @@
 *   Material design.
 
 ## 🌟 Nuevas mejoras a futuro
-*   Utilizar Room como base de datos
 *   Agregar favoritos
 *   Acceso directo a plataformas virtuales de streaming como (Netflix)
 *   Incluir Firebase (Crashlytics)
@@ -34,7 +33,7 @@ git https://github.com/fmoreno24/FabinMovies.git
 *   [Volley](https://github.com/google/volley) - Cliente HTTP con seguridad de tipos para Android y Java de Google.
 *   [Gson](https://github.com/google/gson) - Para serialización / deserialización de objetos Java en JSON y viceversa
 *   [ViewPager2](https://developer.android.com/jetpack/androidx/releases/viewpager2) - Muestra los objetos View o Snippet en formato desplazable.
-
+*   [Room](https://developer.android.com/jetpack/androidx/releases/room) - Base de datos Room
 
 #### 1. API Utilizada
 *   [Themoviedb] (https://developers.themoviedb.org/) - API
