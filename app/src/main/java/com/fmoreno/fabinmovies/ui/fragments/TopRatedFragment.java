@@ -18,7 +18,7 @@ import android.widget.Toast;
 import androidx.appcompat.widget.SearchView;
 import androidx.core.app.ActivityOptionsCompat;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -28,15 +28,18 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
 import com.fmoreno.fabinmovies.R;
 import com.fmoreno.fabinmovies.adapter.RecyclerViewTopRatedAdapter;
+import com.fmoreno.fabinmovies.db.Entity.Movie;
+import com.fmoreno.fabinmovies.db.ViewModel.MovieViewModel;
 import com.fmoreno.fabinmovies.interfaces.RecyclerViewInterface;
 import com.fmoreno.fabinmovies.internet.WebApiRequest;
-import com.fmoreno.fabinmovies.model.Movie;
 import com.fmoreno.fabinmovies.model.MovieList;
 import com.fmoreno.fabinmovies.ui.DetailMovieActivity;
 import com.fmoreno.fabinmovies.utils.Utils;
-//import com.fmoreno.fabinmovies.viewmodel.PopularViewModel;
 
 import java.util.ArrayList;
+import java.util.List;
+//import com.fmoreno.fabinmovies.viewmodel.PopularViewModel;
+
 
 public class TopRatedFragment extends Fragment implements RecyclerViewInterface {
     public static final String TAG = "PopularFragment";
@@ -64,7 +67,12 @@ public class TopRatedFragment extends Fragment implements RecyclerViewInterface 
     //current page number
     private int pageNumber = 1;
 
+    ViewModelProvider.AndroidViewModelFactory factory;
+    public MovieViewModel movieViewModel;
+
     MovieList movieListModel;
+
+    List<Movie> mMovieList;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -90,6 +98,8 @@ public class TopRatedFragment extends Fragment implements RecyclerViewInterface 
 
         init();
 
+        initViewModelRoom();
+
         callGetTopRatedMoviesApi();
         //viewModel = ViewModelProviders.of(this).get(PopularViewModel.class);
         //viewModel.getUserMutableLiveData().observe(context.getActivity(), userListUpdateObserver);
@@ -97,7 +107,17 @@ public class TopRatedFragment extends Fragment implements RecyclerViewInterface 
         return mRootView;
     }
 
-    Observer<ArrayList<Movie>> userListUpdateObserver = new Observer<ArrayList<Movie>>() {
+    private void initViewModelRoom() {
+        try{
+            factory = ViewModelProvider.AndroidViewModelFactory.getInstance(context.getActivity().getApplication());
+
+            movieViewModel = new ViewModelProvider(this, factory).get(MovieViewModel.class);
+        }catch (Exception ex){
+            Log.e(TAG, ex.toString());
+        }
+    }
+
+    /*Observer<ArrayList<Movie>> userListUpdateObserver = new Observer<ArrayList<Movie>>() {
         @Override
         public void onChanged(ArrayList<Movie> userArrayList) {
             //recyclerViewAdapter = new RecyclerViewAdapter(context.getActivity());
@@ -108,7 +128,7 @@ public class TopRatedFragment extends Fragment implements RecyclerViewInterface 
             rv_toprated.clearOnScrollListeners(); //clear scrolllisteners
             rv_toprated.setAdapter(recyclerViewAdapter);
         }
-    };
+    };*/
 
     private void init(){
         /**
@@ -243,10 +263,31 @@ public class TopRatedFragment extends Fragment implements RecyclerViewInterface 
                     pageNumber++;
 
                     movieListModel = (MovieList) Utils.jsonToPojo(response, MovieList.class);
-
+                    mMovieList = new ArrayList<>();
                     if (movieListModel.getResults() != null &&
                             movieListModel.getResults().size() > 0) {
-                        recyclerViewAdapter.addMovies(movieListModel.getResults());
+
+                        try{
+
+                            for(MovieList.Result tmpMovie: movieListModel.getResults()){
+                                Movie movie = new Movie(tmpMovie.getId(),
+                                        tmpMovie.getTitle(),
+                                        tmpMovie.getPosterPath(),
+                                        tmpMovie.getBackdropPath(),
+                                        tmpMovie.getOverview(),
+                                        tmpMovie.getPopularity(),
+                                        tmpMovie.getVoteAverage(),
+                                        tmpMovie.getVoteCount(),
+                                        tmpMovie.getReleaseDate());
+                                if(!mMovieList.contains(movie)){
+                                    mMovieList.add(movie);
+                                    movieViewModel.insert(movie);
+                                }
+                            }
+                            recyclerViewAdapter.addMovies(mMovieList);
+                        }catch (Exception ex){
+                            Log.e("Error DATABASE", ex.toString());
+                        }
                     } else {
                         Log.e(TAG, "list empty==");
                     }
@@ -275,10 +316,10 @@ public class TopRatedFragment extends Fragment implements RecyclerViewInterface 
             }
         };
     }
-    MovieList.Result movie;
+    Movie movie;
 
     @Override
-    public void onItemClick(MovieList.Result result, View view) {
+    public void onItemClick(Movie result, View view) {
         movie = result;
         Intent datailActivity = new Intent(context.getActivity(), DetailMovieActivity.class);
         datailActivity.putExtra("movie", movie);

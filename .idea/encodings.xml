@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/GenerateRoomBackup/src/main/java/com/fmoreno/generateroombackup/AESEncryptionHelper.kt" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/GenerateRoomBackup/src/main/java/com/fmoreno/generateroombackup/AESEncryptionManager.kt" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/GenerateRoomBackup/src/main/java/com/fmoreno/generateroombackup/OnCompleteListener.kt" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/GenerateRoomBackup/src/main/java/com/fmoreno/generateroombackup/RoomBackup.kt" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/com/fmoreno/fabinmovies/ui/SplashActivity.java" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/app/src/main/res/anim" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/app/src/main/res/anim/atg.xml" charset="UTF-8" />

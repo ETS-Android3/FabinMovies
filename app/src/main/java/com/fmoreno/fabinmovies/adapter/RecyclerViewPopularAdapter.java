@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.fmoreno.fabinmovies.R;
 import com.fmoreno.fabinmovies.adapter.filters.PopularFilter;
+import com.fmoreno.fabinmovies.db.Entity.Movie;
 import com.fmoreno.fabinmovies.interfaces.RecyclerViewInterface;
 import com.fmoreno.fabinmovies.model.MovieList;
 
@@ -30,8 +31,8 @@ implements Filterable {
     public PopularFilter mFilter;
     RecyclerViewInterface recyclerViewInterface;
 
-    public static List<MovieList.Result> moviesList = new ArrayList<>();
-    public static List<MovieList.Result> mFilteredMoviesList = new ArrayList<>();
+    public static List<Movie> moviesList = new ArrayList<>();
+    public static List<Movie> mFilteredMoviesList = new ArrayList<>();
     private Context context;
 
 
@@ -50,16 +51,6 @@ implements Filterable {
         }
         return mFilter;
 
-    }
-
-    // method for filtering our recyclerview items.
-    public void filterList(ArrayList<MovieList.Result> filterllist) {
-        // below line is to add our filtered
-        // list in our course array list.
-        moviesList = filterllist;
-        // below line is to notify our adapter
-        // as change in recycler view data.
-        notifyDataSetChanged();
     }
 
     @NonNull
@@ -92,9 +83,14 @@ implements Filterable {
      * @param movies
      */
 
-    public void addMovies(List<MovieList.Result> movies) {
+    public void addMovies(List<Movie> movies) {
         moviesList.addAll(movies);
         Log.e(TAG, "size of movie list==" + moviesList.size());
+        notifyDataSetChanged();
+    }
+
+    public void submitList(List<Movie> movies) {
+        moviesList = movies;
         notifyDataSetChanged();
     }
 

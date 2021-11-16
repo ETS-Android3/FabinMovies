@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/FabinMovies.iml" filepath="$PROJECT_DIR$/.idea/modules/FabinMovies.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/GenerateRoomBackup/FabinMovies.GenerateRoomBackup.iml" filepath="$PROJECT_DIR$/.idea/modules/GenerateRoomBackup/FabinMovies.GenerateRoomBackup.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/FabinMovies.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/FabinMovies.app.iml" />
     </modules>
   </component>

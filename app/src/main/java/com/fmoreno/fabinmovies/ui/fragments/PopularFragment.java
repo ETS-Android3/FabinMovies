@@ -18,8 +18,9 @@ import android.widget.Toast;
 import androidx.appcompat.widget.SearchView;
 import androidx.core.app.ActivityOptionsCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -29,16 +30,17 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
 import com.fmoreno.fabinmovies.R;
 import com.fmoreno.fabinmovies.adapter.RecyclerViewPopularAdapter;
+import com.fmoreno.fabinmovies.db.Entity.Movie;
+import com.fmoreno.fabinmovies.db.ViewModel.MovieViewModel;
 import com.fmoreno.fabinmovies.interfaces.RecyclerViewInterface;
 import com.fmoreno.fabinmovies.internet.WebApiRequest;
-import com.fmoreno.fabinmovies.model.Movie;
 import com.fmoreno.fabinmovies.model.MovieList;
 import com.fmoreno.fabinmovies.ui.DetailMovieActivity;
 import com.fmoreno.fabinmovies.utils.Utils;
 import com.fmoreno.fabinmovies.viewmodel.PopularViewModel;
 
 import java.util.ArrayList;
-
+import java.util.List;
 
 
 public class PopularFragment extends Fragment implements RecyclerViewInterface {
@@ -68,6 +70,10 @@ public class PopularFragment extends Fragment implements RecyclerViewInterface {
     private int pageNumber = 1;
 
     MovieList movieListModel;
+    List<Movie> mMovieList;
+
+    ViewModelProvider.AndroidViewModelFactory factory;
+    public MovieViewModel movieViewModel;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -93,12 +99,24 @@ public class PopularFragment extends Fragment implements RecyclerViewInterface {
 
         init();
 
+        initViewModelRoom();
+
         callGetTopRatedMoviesApi();
         /*viewModel = ViewModelProviders.of(this).get(PopularViewModel.class);
         viewModel.getUserMutableLiveData().observe(context.getActivity(), userListUpdateObserver);
         //Inflate the layout for this fragment
         viewModel.setContext(context.getActivity());*/
         return mRootView;
+    }
+
+    private void initViewModelRoom() {
+        try{
+            factory = ViewModelProvider.AndroidViewModelFactory.getInstance(context.getActivity().getApplication());
+
+            movieViewModel = new ViewModelProvider(this, factory).get(MovieViewModel.class);
+        }catch (Exception ex){
+            Log.e(TAG, ex.toString());
+        }
     }
 
     /*Observer<ArrayList<Movie>> userListUpdateObserver = new Observer<ArrayList<Movie>>() {
@@ -214,6 +232,21 @@ public class PopularFragment extends Fragment implements RecyclerViewInterface {
             Toast.makeText(context.getActivity(),
                     "No internet ..Please connect to internet and start app again",
                     Toast.LENGTH_SHORT).show();
+            //LiveData<List<Movie>> data =  movieViewModel.getMovieList();
+            movieViewModel.getMovieList().observe(getViewLifecycleOwner(), new Observer<List<Movie>>() {
+                @Override
+                public void onChanged(List<Movie> movieList) {
+                    if (movieList.isEmpty()) {
+                        // TODO: 11/7/2018 optimize this
+                        // display empty state since there is no favorites in database
+                        Log.d("dataMovie1", movieList.toString());
+                    } else {
+                        Log.d("dataMovie2", movieList.toString());
+                        recyclerViewPopularAdapter.submitList(movieList);
+                    }
+                }
+            });
+            //Log.d("dataMovie", data.toString());
             return;
         }
 
@@ -247,10 +280,31 @@ public class PopularFragment extends Fragment implements RecyclerViewInterface {
                     pageNumber++;
 
                     movieListModel = (MovieList) Utils.jsonToPojo(response, MovieList.class);
-
+                    mMovieList = new ArrayList<>();
                     if (movieListModel.getResults() != null &&
                             movieListModel.getResults().size() > 0) {
-                        recyclerViewPopularAdapter.addMovies(movieListModel.getResults());
+
+                        try{
+
+                            for(MovieList.Result tmpMovie: movieListModel.getResults()){
+                                Movie movie = new Movie(tmpMovie.getId(),
+                                        tmpMovie.getTitle(),
+                                        tmpMovie.getPosterPath(),
+                                        tmpMovie.getBackdropPath(),
+                                        tmpMovie.getOverview(),
+                                        tmpMovie.getPopularity(),
+                                        tmpMovie.getVoteAverage(),
+                                        tmpMovie.getVoteCount(),
+                                        tmpMovie.getReleaseDate());
+                                if(!mMovieList.contains(movie)){
+                                    mMovieList.add(movie);
+                                    movieViewModel.insert(movie);
+                                }
+                            }
+                            recyclerViewPopularAdapter.addMovies(mMovieList);
+                        }catch (Exception ex){
+                            Log.e("Error DATABASE", ex.toString());
+                        }
                     } else {
                         Log.e(TAG, "list empty==");
                     }
@@ -279,9 +333,10 @@ public class PopularFragment extends Fragment implements RecyclerViewInterface {
             }
         };
     }
-    MovieList.Result movie;
+    Movie movie;
+
     @Override
-    public void onItemClick(MovieList.Result result, View view) {
+    public void onItemClick(Movie result, View view) {
         movie = result;
         Intent datailActivity = new Intent(context.getActivity(), DetailMovieActivity.class);
         datailActivity.putExtra("movie", movie);

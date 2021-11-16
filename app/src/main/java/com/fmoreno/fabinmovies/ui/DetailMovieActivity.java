@@ -29,6 +29,7 @@ import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
 import com.fmoreno.fabinmovies.R;
 import com.fmoreno.fabinmovies.adapter.TrailersAdapter;
+import com.fmoreno.fabinmovies.db.Entity.Movie;
 import com.fmoreno.fabinmovies.internet.WebApiRequest;
 import com.fmoreno.fabinmovies.model.DetailMovie;
 import com.fmoreno.fabinmovies.model.MovieList;
@@ -38,7 +39,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DetailMovieActivity extends AppCompatActivity {
-    MovieList.Result movie;
+    Movie movie;
     DetailMovie movieDetail;
 
     ConstraintLayout clMovieDetail;
@@ -58,7 +59,7 @@ public class DetailMovieActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail_movie);
-        movie = (MovieList.Result) getIntent().getSerializableExtra("movie");
+        movie = (Movie) getIntent().getSerializableExtra("movie");
         initView();
         setImage();
         callGetTopRatedMoviesApi();
