@@ -1,4 +1,6 @@
 <resources>
     <string name="app_name">FabinMovies</string>
     <string name="str_name">Fabián Moreno</string>
+    <string name="str_no_internet">No hay Internet... la aplicación está trabajando Offline.</string>
+    <string name="str_error_server">Error del servidor, intente nuevamente...</string>
 </resources>

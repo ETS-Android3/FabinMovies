@@ -48,6 +48,14 @@ public class Movie implements Serializable {
     @SerializedName("release_date")
     public String releaseDate = "";
 
+    @ColumnInfo(name = "tagline")
+    @SerializedName("tagline")
+    public String tagline;
+
+    @ColumnInfo(name = "category")
+    @SerializedName("category")
+    public String category = "";
+
     public Movie(int id,
                  String title,
                  String posterPath,
@@ -56,7 +64,8 @@ public class Movie implements Serializable {
                  Float popularity,
                  Float voteAverage,
                  int voteCount,
-                 String releaseDate) {
+                 String releaseDate,
+                 String category) {
         this.id = id;
         this.title = title;
         this.posterPath = posterPath;
@@ -66,6 +75,7 @@ public class Movie implements Serializable {
         this.voteAverage = voteAverage;
         this.voteCount = voteCount;
         this.releaseDate = releaseDate;
+        this.category = category;
     }
 
     public int getId() {
@@ -102,6 +112,14 @@ public class Movie implements Serializable {
 
     public String getReleaseDate() {
         return releaseDate;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public String getTagline() {
+        return tagline;
     }
 
     public String getLikes(){

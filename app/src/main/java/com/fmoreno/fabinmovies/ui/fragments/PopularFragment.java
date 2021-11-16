@@ -230,10 +230,10 @@ public class PopularFragment extends Fragment implements RecyclerViewInterface {
 
         if (!Utils.isNetworkAvailable(context.getActivity())) {
             Toast.makeText(context.getActivity(),
-                    "No internet ..Please connect to internet and start app again",
+                    getResources().getString(R.string.str_no_internet),
                     Toast.LENGTH_SHORT).show();
             //LiveData<List<Movie>> data =  movieViewModel.getMovieList();
-            movieViewModel.getMovieList().observe(getViewLifecycleOwner(), new Observer<List<Movie>>() {
+            movieViewModel.getMovieListPopular().observe(getViewLifecycleOwner(), new Observer<List<Movie>>() {
                 @Override
                 public void onChanged(List<Movie> movieList) {
                     if (movieList.isEmpty()) {
@@ -295,7 +295,8 @@ public class PopularFragment extends Fragment implements RecyclerViewInterface {
                                         tmpMovie.getPopularity(),
                                         tmpMovie.getVoteAverage(),
                                         tmpMovie.getVoteCount(),
-                                        tmpMovie.getReleaseDate());
+                                        tmpMovie.getReleaseDate(),
+                                        "popular");
                                 if(!mMovieList.contains(movie)){
                                     mMovieList.add(movie);
                                     movieViewModel.insert(movie);
@@ -328,8 +329,7 @@ public class PopularFragment extends Fragment implements RecyclerViewInterface {
             public void onErrorResponse(VolleyError error) {
                 hideProgress();
                 Log.e("volley error", "volley error");
-                Toast.makeText(context.getActivity(), "" +
-                        "Server Error..Please try again after sometime", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context.getActivity(), getResources().getString(R.string.str_error_server), Toast.LENGTH_SHORT).show();
             }
         };
     }

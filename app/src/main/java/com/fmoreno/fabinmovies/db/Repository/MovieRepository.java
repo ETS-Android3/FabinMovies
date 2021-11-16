@@ -11,7 +11,8 @@ import com.fmoreno.fabinmovies.db.Entity.Movie;
 import java.util.List;
 
 public class MovieRepository {
-    private final LiveData<List<Movie>> mMovieList;
+    private final LiveData<List<Movie>> mMovieListPopular;
+    private final LiveData<List<Movie>> mMovieListTopRated;
     private final MovieDao mMovieListDao;
     private DataBase db;
     private Context mContext;
@@ -20,16 +21,27 @@ public class MovieRepository {
         mContext = context;
         db = DataBase.getInstance(context);
         mMovieListDao = db.movieDao();
-        mMovieList = mMovieListDao.getAll();
+        mMovieListPopular = mMovieListDao.getMoviesPopular();
+        mMovieListTopRated = mMovieListDao.getMoviesTopRated();
     }
 
-    public LiveData<List<Movie>> getAllMovieList() {
-        return mMovieList;
+    public LiveData<List<Movie>> getMovieListPopular() {
+        return mMovieListPopular;
+    }
+
+    public LiveData<List<Movie>> getMovieListTopRated() {
+        return mMovieListTopRated;
     }
 
     public void insert(Movie personList) {
         DataBase.dbExecutor.execute(
                 () -> mMovieListDao.insert(personList)
+        );
+    }
+
+    public void updateTagline(int id, String tagline) {
+        DataBase.dbExecutor.execute(
+                () -> mMovieListDao.updateMovie(id, tagline)
         );
     }
 }

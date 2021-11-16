@@ -89,6 +89,11 @@ public class RecyclerViewTopRatedAdapter extends RecyclerView.Adapter<RecyclerVi
         notifyDataSetChanged();
     }
 
+    public void submitList(List<Movie> movies) {
+        moviesList = movies;
+        notifyDataSetChanged();
+    }
+
     @Override
     public int getItemCount() {
         return moviesList.size();

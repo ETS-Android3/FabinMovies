@@ -19,6 +19,8 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -30,6 +32,9 @@ import com.bumptech.glide.Glide;
 import com.fmoreno.fabinmovies.R;
 import com.fmoreno.fabinmovies.adapter.TrailersAdapter;
 import com.fmoreno.fabinmovies.db.Entity.Movie;
+import com.fmoreno.fabinmovies.db.Entity.MovieVideos;
+import com.fmoreno.fabinmovies.db.ViewModel.MovieVideosViewModel;
+import com.fmoreno.fabinmovies.db.ViewModel.MovieViewModel;
 import com.fmoreno.fabinmovies.internet.WebApiRequest;
 import com.fmoreno.fabinmovies.model.DetailMovie;
 import com.fmoreno.fabinmovies.model.MovieList;
@@ -46,14 +51,18 @@ public class DetailMovieActivity extends AppCompatActivity {
 
     private ProgressBar progressBar;
 
-    TextView textViewTitle,textViewVotes,textViewStars,textViewDate,textViewDescription,textViewTagline;
+    TextView textViewTitle,textViewVotes,textViewStars,textViewDate,textViewDescription,textViewTagline, label_trailers;
 
     ImageView imageViewPoster, imageViewBanner;
 
     RecyclerView rvTrailers;
     TrailersAdapter adapter;
 
-    public static List<DetailMovie.Video> sVideoList;
+    public static List<MovieVideos> sVideoList;
+
+    ViewModelProvider.AndroidViewModelFactory factory;
+    public MovieViewModel movieViewModel;
+    public MovieVideosViewModel movieVideosViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +70,7 @@ public class DetailMovieActivity extends AppCompatActivity {
         setContentView(R.layout.activity_detail_movie);
         movie = (Movie) getIntent().getSerializableExtra("movie");
         initView();
+        initViewModelRoom();
         setImage();
         callGetTopRatedMoviesApi();
         //setText();
@@ -75,6 +85,7 @@ public class DetailMovieActivity extends AppCompatActivity {
         textViewDate = findViewById(R.id.textViewDate);
         textViewDescription = findViewById(R.id.textViewDescription);
         textViewTagline = findViewById(R.id.textViewTagline);
+        label_trailers = findViewById(R.id.label_trailers);
 
         imageViewPoster = findViewById(R.id.imageViewPoster);
         imageViewBanner = findViewById(R.id.imageViewBanner);
@@ -82,7 +93,7 @@ public class DetailMovieActivity extends AppCompatActivity {
         rvTrailers = findViewById(R.id.rvTrailers);
 
         //if(sVideoList == null){
-            sVideoList = new ArrayList<DetailMovie.Video>();
+            sVideoList = new ArrayList<MovieVideos>();
         //}
         adapter = new TrailersAdapter(sVideoList);
         // Attach the adapter to the recyclerview to populate items
@@ -97,6 +108,17 @@ public class DetailMovieActivity extends AppCompatActivity {
 
     }
 
+    private void initViewModelRoom() {
+        try{
+            factory = ViewModelProvider.AndroidViewModelFactory.getInstance(this.getApplication());
+
+            movieViewModel = new ViewModelProvider(this, factory).get(MovieViewModel.class);
+            movieVideosViewModel = new ViewModelProvider(this, factory).get(MovieVideosViewModel.class);
+        }catch (Exception ex){
+            Log.e(TAG, ex.toString());
+        }
+    }
+
     private void setImage(){
         Glide.with(this)
                 .load("http://image.tmdb.org/t/p/w500" + movie.getPosterPath())
@@ -109,20 +131,35 @@ public class DetailMovieActivity extends AppCompatActivity {
                 .into(imageViewBanner);
     }
 
-    private void setText(){
+    private void setText(boolean isOnline){
         textViewTitle.setText(movie.getTitle());
         textViewVotes.setText(movie.getLikes());
         textViewStars.setText(movie.getStars());
         textViewDate.setText(Utils.getYear(movie.getReleaseDate()));
         textViewDescription.setText(movie.getOverview());
-        textViewTagline.setText(movieDetail.tagline);
-        for(DetailMovie.Video video : movieDetail.videos.results){
-            sVideoList.add(video);
+        if(isOnline){
+            if(movieDetail != null){
+                textViewTagline.setText(movieDetail.tagline);
+                if(sVideoList != null && sVideoList.size() > 0){
+                    //adapter.notifyDataSetChanged();
+                    label_trailers.setVisibility(View.VISIBLE);
+                    adapter.addMovies(sVideoList);
+                } else {
+                    label_trailers.setVisibility(View.GONE);
+                }
+            } else {
+                label_trailers.setVisibility(View.GONE);
+            }
+        } else {
+            if(sVideoList != null && sVideoList.size() > 0){
+                label_trailers.setVisibility(View.VISIBLE);
+            } else {
+                label_trailers.setVisibility(View.GONE);
+            }
+            textViewTagline.setText(movie.getTagline());
         }
-        if(sVideoList != null && sVideoList.size() > 0){
-            //adapter.notifyDataSetChanged();
-            adapter.addMovies(sVideoList);
-        }
+
+
     }
 
     private void setAnimation(){
@@ -180,8 +217,22 @@ public class DetailMovieActivity extends AppCompatActivity {
 
         if (!Utils.isNetworkAvailable(DetailMovieActivity.this)) {
             Toast.makeText(DetailMovieActivity.this,
-                    "No internet ..Please connect to internet and start app again",
+                    getResources().getString(R.string.str_no_internet),
                     Toast.LENGTH_SHORT).show();
+            movieVideosViewModel.getMovieVideosList(movie.id).observe(this, new Observer<List<MovieVideos>>() {
+                @Override
+                public void onChanged(List<MovieVideos> movieVideosList) {
+                    if (movieVideosList.isEmpty()) {
+                        // TODO: 11/7/2018 optimize this
+                        // display empty state since there is no favorites in database
+                        Log.d("dataMovie1", movieVideosList.toString());
+                    } else {
+                        Log.d("dataMovie2", movieVideosList.toString());
+                        adapter.submitList(movieVideosList);
+                    }
+                }
+            });
+            setText(false);
             return;
         }
 
@@ -217,18 +268,23 @@ public class DetailMovieActivity extends AppCompatActivity {
 
                     movieDetail = (DetailMovie) Utils.jsonToPojo(response, DetailMovie.class);
 
-                    Log.d("Detail", movieDetail.title);
+                    //Log.d("Detail", movieDetail.title);
+                    for(DetailMovie.Video video : movieDetail.videos.results){
+                        MovieVideos movieVideos = new MovieVideos(video.id,
+                                                                    movieDetail.id,
+                                                                    video.name,
+                                                                    video.key,
+                                                                    video.size);
+                        if(!sVideoList.contains(movieVideos)){
+                            sVideoList.add(movieVideos);
+                            movieVideosViewModel.insert(movieVideos);
+                        }
 
-                    setText();
+                    }
+                    setText(true);
                     setAnimation();
 
-
-                   /* if (movieListModel.getResults() != null &&
-                            movieListModel.getResults().size() > 0) {
-                        recyclerViewAdapter.addMovies(movieListModel.getResults());
-                    } else {
-                        Log.e(TAG, "list empty==");
-                    }*/
+                    movieViewModel.updateTagline(movie.getId(), movieDetail.tagline);
 
                 } catch (Exception e) {
                     Log.e(TAG,"Exception=="+e.getLocalizedMessage());
@@ -249,8 +305,7 @@ public class DetailMovieActivity extends AppCompatActivity {
             public void onErrorResponse(VolleyError error) {
                 hideProgress();
                 Log.e("volley error", "volley error");
-                Toast.makeText(DetailMovieActivity.this, "" +
-                        "Server Error..Please try again after sometime", Toast.LENGTH_SHORT).show();
+                Toast.makeText(DetailMovieActivity.this, getResources().getString(R.string.str_error_server), Toast.LENGTH_SHORT).show();
             }
         };
     }

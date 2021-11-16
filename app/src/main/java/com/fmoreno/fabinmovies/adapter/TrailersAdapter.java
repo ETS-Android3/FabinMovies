@@ -21,6 +21,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.fmoreno.fabinmovies.R;
+import com.fmoreno.fabinmovies.db.Entity.Movie;
+import com.fmoreno.fabinmovies.db.Entity.MovieVideos;
 import com.fmoreno.fabinmovies.model.DetailMovie;
 import com.fmoreno.fabinmovies.model.MovieList;
 
@@ -54,10 +56,10 @@ public class TrailersAdapter extends
     }
 
     // Store a member variable for the contacts
-    private List<DetailMovie.Video> mVideos;
+    private List<MovieVideos> mVideos;
 
     // Pass in the contact array into the constructor
-    public TrailersAdapter(List<DetailMovie.Video> videos) {
+    public TrailersAdapter(List<MovieVideos> videos) {
         mVideos = videos;
     }
 
@@ -80,7 +82,7 @@ public class TrailersAdapter extends
     public void onBindViewHolder(TrailersAdapter.ViewHolder holder, int position) {
         Animation startAnimation = AnimationUtils.loadAnimation(holder.itemView.getContext(), R.anim.slide_up);
         // Get the data model based on position
-        DetailMovie.Video video = mVideos.get(position);
+        MovieVideos video = mVideos.get(position);
 
         CardView card_trailer = holder.card_trailer;
         card_trailer.setOnClickListener(new View.OnClickListener() {
@@ -104,9 +106,14 @@ public class TrailersAdapter extends
         holder.itemView.startAnimation(startAnimation);
     }
 
-    public void addMovies(List<DetailMovie.Video> videos) {
+    public void addMovies(List<MovieVideos> videos) {
         mVideos.addAll(videos);
         //Log.e(TAG, "size of movie list==" + moviesList.size());
+        notifyDataSetChanged();
+    }
+
+    public void submitList(List<MovieVideos> videos) {
+        mVideos = videos;
         notifyDataSetChanged();
     }
 
@@ -116,7 +123,7 @@ public class TrailersAdapter extends
         return mVideos.size();
     }
 
-    private void onClickYoutube(DetailMovie.Video video, Context context){
+    private void onClickYoutube(MovieVideos video, Context context){
         Intent appIntent = new Intent(Intent.ACTION_VIEW,
                 Uri.parse("vnd.youtube:" + video.key));
         Intent webIntent = new Intent(Intent.ACTION_VIEW,

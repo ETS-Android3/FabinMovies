@@ -18,6 +18,7 @@ import android.widget.Toast;
 import androidx.appcompat.widget.SearchView;
 import androidx.core.app.ActivityOptionsCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -228,8 +229,22 @@ public class TopRatedFragment extends Fragment implements RecyclerViewInterface 
 
         if (!Utils.isNetworkAvailable(context.getActivity())) {
             Toast.makeText(context.getActivity(),
-                    "No internet ..Please connect to internet and start app again",
+                    getResources().getString(R.string.str_no_internet),
                     Toast.LENGTH_SHORT).show();
+            movieViewModel.getMovieListTopRated().observe(getViewLifecycleOwner(), new Observer<List<Movie>>() {
+                @Override
+                public void onChanged(List<Movie> movieList) {
+                    if (movieList.isEmpty()) {
+                        // TODO: 11/7/2018 optimize this
+                        // display empty state since there is no favorites in database
+                        Log.d("dataMovie1", movieList.toString());
+                    } else {
+                        Log.d("dataMovie2", movieList.toString());
+                        recyclerViewAdapter.submitList(movieList);
+                    }
+                }
+            });
+
             return;
         }
 
@@ -278,7 +293,8 @@ public class TopRatedFragment extends Fragment implements RecyclerViewInterface 
                                         tmpMovie.getPopularity(),
                                         tmpMovie.getVoteAverage(),
                                         tmpMovie.getVoteCount(),
-                                        tmpMovie.getReleaseDate());
+                                        tmpMovie.getReleaseDate(),
+                                        "top_rated");
                                 if(!mMovieList.contains(movie)){
                                     mMovieList.add(movie);
                                     movieViewModel.insert(movie);
@@ -311,8 +327,7 @@ public class TopRatedFragment extends Fragment implements RecyclerViewInterface 
             public void onErrorResponse(VolleyError error) {
                 hideProgress();
                 Log.e("volley error", "volley error");
-                Toast.makeText(context.getActivity(), "" +
-                        "Server Error..Please try again after sometime", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context.getActivity(), getResources().getString(R.string.str_error_server), Toast.LENGTH_SHORT).show();
             }
         };
     }

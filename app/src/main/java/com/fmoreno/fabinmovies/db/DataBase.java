@@ -9,16 +9,19 @@ import androidx.room.RoomDatabase;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import com.fmoreno.fabinmovies.db.Dao.MovieDao;
+import com.fmoreno.fabinmovies.db.Dao.MovieVideosDao;
 import com.fmoreno.fabinmovies.db.Entity.Movie;
+import com.fmoreno.fabinmovies.db.Entity.MovieVideos;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@Database(entities = {Movie.class}, version = 1, exportSchema = false)
+@Database(entities = {Movie.class, MovieVideos.class}, version = 2, exportSchema = false)
 public abstract class DataBase extends RoomDatabase {
     private static Context mContext;
     // Exposición de DAOs
     public abstract MovieDao movieDao();
+    public abstract MovieVideosDao movieVideosDao();
 
     private static final String DATABASE_NAME = "database-movie-db";
 

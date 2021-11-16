@@ -14,19 +14,28 @@ import java.util.List;
 public class MovieViewModel extends AndroidViewModel {
     private final MovieRepository mRepository;
 
-    private final LiveData<List<Movie>> mMovieList;
+    private final LiveData<List<Movie>> mMovieListPopular;
+    private final LiveData<List<Movie>> mMovieListTopRated;
 
     public MovieViewModel(@NonNull Application application) {
         super(application);
         mRepository = new MovieRepository(application);
-        mMovieList = mRepository.getAllMovieList();
+        mMovieListPopular = mRepository.getMovieListPopular();
+        mMovieListTopRated = mRepository.getMovieListTopRated();
     }
 
-    public LiveData<List<Movie>> getMovieList() {
-        return mMovieList;
+    public LiveData<List<Movie>> getMovieListPopular() {
+        return mMovieListPopular;
+    }
+    public LiveData<List<Movie>> getMovieListTopRated() {
+        return mMovieListTopRated;
     }
 
     public void insert(Movie movieList) {
         mRepository.insert(movieList);
+    }
+
+    public void updateTagline(int id, String tagline) {
+        mRepository.updateTagline(id, tagline);
     }
 }
