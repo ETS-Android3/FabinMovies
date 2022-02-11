@@ -44,10 +44,8 @@ public class PopularFilter extends Filter {
 
     @Override
     protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
-
         recyclerViewPopularAdapter.moviesList.clear();
         recyclerViewPopularAdapter.moviesList.addAll((ArrayList<Movie>)filterResults.values);
         recyclerViewPopularAdapter.notifyDataSetChanged();
-
     }
 }
